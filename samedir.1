@@ -1,0 +1,26 @@
+.TH SAMEDIR 1
+.SH NAME
+samedir \- open terminal in same directory of active window
+.SH SYNOPSIS
+.B samedir
+.SH DESCRIPTION
+.B samedir
+runs
+.B $TERMCMD
+(by default,
+.B \(dqxterm\(dq )
+on the same current working directory as the currently active window.
+.SH ENVIRONMENT
+The following environment variables affect the execution of
+.BR samedir .
+.TP
+.B TERMCMD
+Command for the terminal emulator program.
+If not set, use
+\(dqxterm\(dq
+instead.
+.SH SEE ALSO
+.IR cwdof (1),
+.IR pstree (1),
+.IR xdotool (1),
+.IR xprop (1)

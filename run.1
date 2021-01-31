@@ -1,0 +1,37 @@
+.TH RUN 1
+.SH NAME
+run \- run a .desktop file
+.SH SYNOPSIS
+.B run
+.RI [ name | file ]
+.SH DESCRIPTION
+.B run
+runs the program described by a .desktop file.
+.PP
+When run without arguments,
+.B run
+searches
+.B $APPPATH
+for .desktop files and list all the found ones without the .desktop extension,
+along with their description, separated by a tab.
+When run with a argument name and this argument is equal to one of the .desktop files
+in $APPATH without the .desktop extension, this .desktop file is executed.
+When run with a argument name and this argument is the path to a .desktop file,
+this .desktop file is executed.
+.SH ENVIRONMENT
+The following environment variables affect the execution of
+.BR run .
+.TP
+.B APPPATH
+Colon-separated list of paths to directories containing .desktop files.
+If not set, use
+\(dq/usr/local/share/applications:/usr/share/applications\(dq
+instead.
+.TP
+.B TERMCMD
+Command for the terminal emulator program.
+If not set, use
+\(dqxterm\(dq
+instead.
+.SH SEE ALSO
+.IR xdg-desktop-menu (1)

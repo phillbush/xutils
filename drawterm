@@ -1,0 +1,15 @@
+#!/bin/sh
+# spawn a new terminal window inside a drawn rectangle
+
+set -e
+
+wglyph=7
+hglyph=16
+border=2
+
+slop | tr 'x+' ' ' | {
+	read w h x y
+	w=$(( ( w - border ) / wglyph ))
+	h=$(( ( h - border ) / hglyph ))
+	exec xterm -class "drawterm" -geometry ${w}x${h}+${x}+${y}
+}

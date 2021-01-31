@@ -1,0 +1,62 @@
+#!/bin/sh
+# run - run a .desktop file
+# this file in public domain
+
+tflag=""
+apppath=${APPPATH:-/usr/local/share/applications:/usr/share/applications}
+termcmd=${TERMCMD:-xterm}
+origifs="$IFS"
+
+# get desktop files
+getfiles() {
+	IFS=:
+	for dir in $apppath
+	do
+		grep -iL "NoDisplay=true" "$dir"/*.desktop 2>/dev/null
+	done
+	IFS="$origifs"
+}
+
+# get application names (and its comment, if $tflag is set)
+getapps() {
+	for file in $(getfiles)
+	do
+		printf "%s" "$file" | sed 's:^\([^/]*/\)*\(.*\.\)*\([^.]*\)\.desktop$:\3:'
+		comment="$(sed -n "/^\[Desktop Entry\]$/,/^Comment *=/{/^Comment *=/{s/^Comment *= *//;p;};}" "$file")"
+		[ -n "$comment" ] && printf "\t%s" "$comment"
+		echo
+	done
+}
+
+# run an application
+run() {
+	term="$(sed -n "/^\[Desktop Entry\]$/,/^Terminal *=/{/^Terminal *=/{s/^Terminal *=//;p;};}" "$1")"
+	cmd="$(sed -n "/^\[Desktop Entry\]$/,/^Exec *=/{/^Exec *=/{s/^Exec *=//;s/ *%[uUFf].*//;p;};}" "$1")"
+	shift
+	trap "" 1 15
+	if [ "$term" = "true" ]
+	then
+		exec $TERMCMD -e sh -c "$cmd $@" &
+	else
+		exec sh -c "$cmd $@" &
+	fi
+}
+
+case "$#" in
+0)
+	getapps
+	;;
+*)
+	if [ -f "$1" ]
+	then
+		desktopfile="$1"
+	else
+		desktopfile="$(getfiles | egrep -m 1 "^([^/]*/)*(.*\.)*$1\.desktop$")"
+		[ -z "$desktopfile" ] && echo "unknown application" >&2 && exit 1
+	fi
+	shift
+	run "$desktopfile" $@
+	;;
+esac
+
+exit 0

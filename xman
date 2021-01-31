@@ -1,0 +1,30 @@
+#!/bin/sh
+# xman - open man pages in zathura
+# this file in public domain
+
+printman() {
+	apropos -k . |\
+	awk -F '[()]| - ' \
+	'{
+		section=$2
+		if ($1 ~ /[^(]*, [^(]*/) {
+			split($1, a, ", ")
+			for (n in a) {
+				print a[n] "\t" "(" section ") " $4
+			}
+		} else {
+			print $1 "\t" "(" section ") " $4
+		}
+	}'
+}
+
+case "$#" in
+0)
+	printman
+	;;
+*)
+	exec /usr/bin/man -Tpdf $* | ifne zathura -
+	;;
+esac
+
+exit 0

@@ -1,0 +1,90 @@
+                                 XUtils
+
+XUtils are a set of POSIX scripts that implement some handy wrappers for
+X programs.  Each script has its respective manual page.
+
+The scripts are the following.
+• drawterm: Draw a terminal on screen a la Plan9.
+• img:      Wrapper around sxiv to use thumbnail view.
+• run:      Run a .desktop file
+• samedir:  Open a terminal in the same directory of focused window.
+• xman:     Open man pages with zatura.
+• xopen:    Open file or URL with an application.
+
+
+§ Installation
+
+The following lists the dependencies each script has.
+• drawterm: slop(1) and xterm(1) (can be replaced with st(1) or urxvt(1)).
+• img:      sxiv(1).
+• run:      Variable.
+• samedir:  pstree(1), cwdof(1).
+• xman:     man(1), zathura(1).
+
+First, edit ./config.mk to match your local setup.
+
+Since XUtils are just script, they do not need to be built.
+
+By default, XUtils are installed into the /usr/local prefix.  Enter the
+following command to install XUtils (if necessary as root).  This command
+installs the scripts into the ${PREFIX}/bin/ directory, and the manual
+pages into the ${MANPREFIX}/man1/ directory.
+
+	make install
+
+
+§ Usage
+
+drawterm(1) is hardcoded to my terminal font size and border width.  You
+need to edit this script for it to fit your terminal size. The variables
+`wglyph`, `hglyph`, and `border` refer to glyph width, glyph height and
+border width, respectively.  Then, just run drawterm, and it will run
+slop(1), an utility that draws a rectangle on the screen with the mouse.
+After drawing the rectangle, a xterm window will appear in the place of
+the drawn rectangle.
+
+img(1) opens a image with sxiv(1).  It then lists all files in the same
+directory in a thumbnail view mode.  You can also use this script to
+open a directory, in which case all the image files in it will be listed
+in the thumbnail view mode.
+
+run(1) needs two environment variables: $APPPATH, a colon-separated list
+of paths to directories containing .desktop files (by default it is set
+to “/usr/local/share/applications:/usr/share/applications”); and
+$TERMCMD, which is the name of a terminal command (by default it is set
+to “xterm”).  When run without arguments, run(1) lists all the .desktop
+files in $APPPATH without the .desktop extension, and also a description
+for each file separated by a tab character.  When run with arguments,
+its first argument may be either a path to a .desktop file, or one of
+the names listed by running run(1) without argument; in either case, the
+corresponding .desktop file will be run with the remaining arguments.
+For example, to run firefox, type:
+
+	$ run firefox
+
+samedir(1) is a tricky script.  It works for me in my OpenBSD with the
+help of another program of mine, called cwdof[1]).  If you use Linux (or
+other OS with /proc file system), the version of samedir(1) by Luke
+Smith[2] may better fit you.  This script spawns a $TERMCMD (by default
+“xterm”) in the same directory as the currently active window.
+
+[1]: https://github.com/phillbush/cwdof
+[2]: https://github.com/LukeSmithxyz/voidrice/blob/master/.local/bin/samedir
+
+xman(1) can be run in two ways.  Without arguments, it lists all the
+available man pages and their description (separated with a tab).  With
+arguments, it calls man(1) with those arguments and redirect the output
+to zathura(1), effectively opening manpages with the PDF reader program.
+
+xopen(1) opens a file with the default application specified, as
+specified in the file whose path is in the environment variable
+$MIMEFILE.
+
+	$ xopen file.jpg
+
+
+§ License
+
+Except for img(1) (which was copied from the ranger file manager), all
+the scripts are, in public domain.  All the scripts are provided AS IS,
+with NO WARRANTY.

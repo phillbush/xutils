@@ -1,0 +1,25 @@
+.TH DRAWTERM 1
+.SH NAME
+drawterm \- draw a terminal à la Plan9
+.SH SYNOPSIS
+.B drawterm
+.SH DESCRIPTION
+.B drawterm
+calls slop(1) for the user to draw a rectangle on the screen.
+When the rectangle is drawn,
+it is be replaced with a xterm(1) window with the same size of the rectangle.
+.SH CONFIGURATION
+The script needs to be edited to set the variables
+.BR wglyph ,
+.BR hglyph ,
+and
+.B border
+to the width and height of the glyphs in the font used by the terminal,
+and the width of the border of the terminal in the current window manager.
+.PP
+.B slop(1)
+can be replaced with xrectsel(1).
+And xterm(1) can be replaced with urxvt(1) or st(1).
+.SH SEE ALSO
+.IR slop (1),
+.IR xmenu (1)

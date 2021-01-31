@@ -1,0 +1,18 @@
+#!/bin/sh
+# samedir: open terminal $TERMCMD in the same directory of current window
+
+termcmd=${TERMCMD:-xterm}
+
+# get pid of sibling process of current window
+getpid()
+{
+	wpid="$(xprop -id $(xdotool getwindowfocus) _NET_WM_PID | sed 's/[^=]* = //')"
+	pstree -p "$wpid" | sed -n "/$wpid/,\${/$wpid/p;/ *\\-[-+]=/p;}" | tail -n 1 \
+	                  | sed "s/^[ 	]*.... \([0-9]*\) .*/\1/"
+}
+
+pid=$(getpid)
+cwd=$(cwdof $pid)
+
+cd "$cwd"
+exec $termcmd
