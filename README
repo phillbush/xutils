@@ -18,7 +18,7 @@ The following lists the dependencies each script has.
 • drawterm: slop(1) and xterm(1) (can be replaced with st(1) or urxvt(1)).
 • img:      sxiv(1).
 • run:      Variable.
-• samedir:  pstree(1), cwdof(1).
+• samedir:  xprop(1), xdotool(1), pstree(1), cwdof(1).
 • xman:     man(1), zathura(1).
 
 First, edit ./config.mk to match your local setup.
