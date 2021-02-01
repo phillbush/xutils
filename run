@@ -2,8 +2,9 @@
 # run - run a .desktop file
 # this file in public domain
 
-tflag=""
+iflag=0
 apppath=${APPPATH:-/usr/local/share/applications:/usr/share/applications}
+appiconpath=${APPICONPATH:-/usr/local/share/icons/hicolor/48x48:/usr/share/icons/hicolor/48x48}
 termcmd=${TERMCMD:-xterm}
 origifs="$IFS"
 
@@ -17,11 +18,29 @@ getfiles() {
 	IFS="$origifs"
 }
 
-# get application names (and its comment, if $tflag is set)
+# get icon path
+geticon() {
+	IFS=:
+	for dir in $APPICONPATH
+	do
+		file="$dir/$1.png"
+		[ -f "$file" ] && echo "$file" && return
+	done
+	IFS="$origifs"
+}
+
+# get application names
 getapps() {
 	for file in $(getfiles)
 	do
-		printf "%s" "$file" | sed 's:^\([^/]*/\)*\(.*\.\)*\([^.]*\)\.desktop$:\3:'
+		icon="$(sed -n "/^\[Desktop Entry\]$/,/^Icon *=/{/^Icon *=/{s/^Icon *= *//;p;};}" "$file")"
+		icon="$(geticon "$icon")"
+		if [ $iflag -eq 1 -a -n "$icon" ]
+		then
+			printf 'IMG:%s' "$icon"
+		else
+			printf "%s" "$file" | sed 's:^\([^/]*/\)*\(.*\.\)*\([^.]*\)\.desktop$:\3:'
+		fi
 		comment="$(sed -n "/^\[Desktop Entry\]$/,/^Comment *=/{/^Comment *=/{s/^Comment *= *//;p;};}" "$file")"
 		[ -n "$comment" ] && printf "\t%s" "$comment"
 		echo
@@ -41,6 +60,12 @@ run() {
 		exec sh -c "$cmd $@" &
 	fi
 }
+
+if [ "$1" = '-i' ]
+then
+	iflag=1
+	shift
+fi
 
 case "$#" in
 0)
