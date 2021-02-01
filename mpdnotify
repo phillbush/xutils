@@ -13,7 +13,7 @@ test -n "$CACHEDIR" || { echo 'mpdnotify: $CACHEDIR not set' >&2 && exit 1; }
 trap 'rm -f $coverfile' EXIT
 while s="$(mpc current --wait -f 'TAG:mpd\t%artist%\t%album%\t[[%title%]|[%name%]|[%file%]]')"
 do
-	if ffmpeg -y -i "$musicpath/$(mpc current -f '%file%')" -f image2 "$coverfile" 2>/dev/null
+	if ffmpeg -y -i "$musicdir/$(mpc current -f '%file%')" -f image2 "$coverfile" 2>/dev/null
 	then
 		printf 'IMG:%s\t%s\n' "$coverfile" "$s" >"$XNOTIFY_FIFO"
 	else
