@@ -1,0 +1,23 @@
+.TH MPDNOTIFY 1
+.SH NAME
+mpdnotify \- pop up notification for currently playing song
+.SH SYNOPSIS
+.B mpdnotify
+.SH DESCRIPTION
+.B mpdnotify
+writes into xnotify's pipe the artist, album and title of the song
+currently playing by mpd(1) and the path to its album art, if available.
+.SH ENVIRONMENT
+The following environment variables affect the execution of
+.BR mpdnotify .
+.TP
+.B CACHEDIR
+Path to the user's cache directory.
+.TP
+.B MUSICDIR
+Path to the user's music directory.
+.TP
+.B XNOTIFY_FIFO
+Path to xnotify's input fifo file.
+.SH SEE ALSO
+.IR xnotify (1)

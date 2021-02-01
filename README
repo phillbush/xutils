@@ -4,22 +4,22 @@ XUtils are a set of POSIX scripts that implement some handy wrappers for
 X programs.  Each script has its respective manual page.
 
 The scripts are the following.
-• drawterm: Draw a terminal on screen a la Plan9.
-• img:      Wrapper around sxiv to use thumbnail view.
-• run:      Run a .desktop file
-• samedir:  Open a terminal in the same directory of focused window.
-• xman:     Open man pages with zatura.
-• xopen:    Open file or URL with an application.
+• drawterm:  Draw a terminal on screen a la Plan9.
+• mpdnotify: Pop up a notification for currently playing song.
+• run:       Run a .desktop file
+• samedir:   Open a terminal in the same directory of focused window.
+• xman:      Open man pages with zatura.
+• xopen:     Open file or URL with an application.
 
 
 § Installation
 
 The following lists the dependencies each script has.
-• drawterm: slop(1) and xterm(1) (can be replaced with st(1) or urxvt(1)).
-• img:      sxiv(1).
-• run:      Variable.
-• samedir:  xprop(1), xdotool(1), pstree(1), cwdof(1).
-• xman:     man(1), zathura(1).
+• drawterm:  slop(1) and xterm(1) (can be replaced with st(1) or urxvt(1)).
+• mpdnotify: mpd(1), mpc(1), xnotify(1).
+• run:       Variable.
+• samedir:   xprop(1), xdotool(1), pstree(1), cwdof(1).
+• xman:      man(1), zathura(1).
 
 First, edit ./config.mk to match your local setup.
 
@@ -43,10 +43,9 @@ slop(1), an utility that draws a rectangle on the screen with the mouse.
 After drawing the rectangle, a xterm window will appear in the place of
 the drawn rectangle.
 
-img(1) opens a image with sxiv(1).  It then lists all files in the same
-directory in a thumbnail view mode.  You can also use this script to
-open a directory, in which case all the image files in it will be listed
-in the thumbnail view mode.
+mpdnotify(1) uses mpc(1) `current --wait` command to get the name of the
+currently playing song each time it changes.  You must call mpdnotify(1)
+as background in your ~/.xinitrc, ~/.xsession or related file.
 
 run(1) needs two environment variables: $APPPATH, a colon-separated list
 of paths to directories containing .desktop files (by default it is set
