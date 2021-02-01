@@ -23,7 +23,7 @@ case "$#" in
 	printman
 	;;
 *)
-	exec /usr/bin/man -Tpdf $* | ifne zathura -
+	exec /usr/bin/man -Tpdf $* | ifne zathura - &
 	;;
 esac
 
