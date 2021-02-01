@@ -37,12 +37,13 @@ getapps() {
 		icon="$(geticon "$icon")"
 		if [ $iflag -eq 1 -a -n "$icon" ]
 		then
-			printf 'IMG:%s' "$icon"
+			printf 'IMG:%s\t' "$icon"
+			printf "%s" "$file" | sed 's:^\([^/]*/\)*\(.*\.\)*\([^.]*\)\.desktop$:\3:'
 		else
 			printf "%s" "$file" | sed 's:^\([^/]*/\)*\(.*\.\)*\([^.]*\)\.desktop$:\3:'
+			comment="$(sed -n "/^\[Desktop Entry\]$/,/^Comment *=/{/^Comment *=/{s/^Comment *= *//;p;};}" "$file")"
+			[ -n "$comment" ] && printf "\t%s" "$comment"
 		fi
-		comment="$(sed -n "/^\[Desktop Entry\]$/,/^Comment *=/{/^Comment *=/{s/^Comment *= *//;p;};}" "$file")"
-		[ -n "$comment" ] && printf "\t%s" "$comment"
 		echo
 	done
 }
