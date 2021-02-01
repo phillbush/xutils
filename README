@@ -1,7 +1,7 @@
                                  XUtils
 
-XUtils are a set of POSIX scripts that implement some handy wrappers for
-X programs.  Each script has its respective manual page.
+XUtils are a set of POSIX scripts that implement some handy X-related
+utilities.  Each script has its respective manual page.
 
 The scripts are the following.
 • drawterm:  Draw a terminal on screen a la Plan9.
@@ -84,6 +84,4 @@ $MIMEFILE.
 
 § License
 
-Except for img(1) (which was copied from the ranger file manager), all
-the scripts are in public domain.  All the scripts are provided AS IS,
-with NO WARRANTY.
+This software is in public domain and is provided AS IS, with NO WARRANTY.
