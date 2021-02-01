@@ -21,7 +21,7 @@ getfiles() {
 # get icon path
 geticon() {
 	IFS=:
-	for dir in $APPICONPATH
+	for dir in $appiconpath
 	do
 		file="$dir/$1.png"
 		[ -f "$file" ] && echo "$file" && return
