@@ -11,5 +11,5 @@ slop | tr 'x+' ' ' | {
 	read w h x y
 	w=$(( ( w - border ) / wglyph ))
 	h=$(( ( h - border ) / hglyph ))
-	exec xterm -class "drawterm" -geometry ${w}x${h}+${x}+${y} &
+	exec xterm -geometry ${w}x${h}+${x}+${y} &
 }
