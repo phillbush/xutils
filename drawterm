@@ -3,13 +3,14 @@
 
 set -e
 
-wglyph=7
-hglyph=16
-border=2
+wglyph=7        # glyph width, in pixels
+hglyph=16       # glyph height, in pixels
+border=7        # border width, in pixels
+title=17        # titlebar height, in pixels
 
 slop | tr 'x+' ' ' | {
 	read w h x y
-	w=$(( ( w - border ) / wglyph ))
-	h=$(( ( h - border ) / hglyph ))
+	w=$(( ( w - ( border / wglyph ) ) / wglyph ))
+	h=$(( ( ( h - ( border / hglyph ) ) / hglyph ) - ( title / hglyph ) ))
 	exec xterm -geometry ${w}x${h}+${x}+${y} &
 }
