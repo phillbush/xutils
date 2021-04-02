@@ -23,9 +23,9 @@ getapps() {
 	do
 		iconname="$(sed -n "/^\[Desktop Entry\]$/,/^Icon *=/{/^Icon *=/{s/^Icon *= *//;p;};}" "$file")"
 		iconpath="$(echo "Applications/$iconname" | icon 64)"
-		if [ $iflag -eq 1 -a -n "$icon" ]
+		if [ $iflag -eq 1 -a -n "$iconpath" ]
 		then
-			printf 'IMG:%s\t' "$icon"
+			printf 'IMG:%s\t' "$iconpath"
 			printf "%s" "$file" | sed 's:^\([^/]*/\)*\(.*\.\)*\([^.]*\)\.desktop$:\3:'
 		else
 			printf "%s" "$file" | sed 's:^\([^/]*/\)*\(.*\.\)*\([^.]*\)\.desktop$:\3:'
