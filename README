@@ -4,7 +4,9 @@ XUtils are a set of POSIX scripts that implement some handy X-related
 utilities.  Each script has its respective manual page.
 
 The scripts are the following.
-• drawterm:  Draw a terminal on screen a la Plan9.
+• drawterm:  Draw a terminal on screen à la Plan9.
+• icon:      Print paths to icons in icon theme.
+• iconcache: Cache png images from svg files.
 • mpdnotify: Pop up a notification for currently playing song.
 • run:       Run a .desktop file
 • samedir:   Open a terminal in the same directory of focused window.
@@ -16,6 +18,8 @@ The scripts are the following.
 
 The following lists the dependencies each script has.
 • drawterm:  slop(1) and xterm(1) (can be replaced with st(1) or urxvt(1)).
+• icon:      awk(1) and test(1)
+• iconcache: inkscape(1)
 • mpdnotify: mpd(1), mpc(1), xnotify(1).
 • run:       Variable.
 • samedir:   xprop(1), xdotool(1), pstree(1), cwdof(1).
@@ -37,11 +41,34 @@ pages into the ${MANPREFIX}/man1/ directory.
 
 drawterm(1) is hardcoded to my terminal font size and border width.  You
 need to edit this script for it to fit your terminal size. The variables
-`wglyph`, `hglyph`, and `border` refer to glyph width, glyph height and
-border width, respectively.  Then, just run drawterm, and it will run
-slop(1), an utility that draws a rectangle on the screen with the mouse.
-After drawing the rectangle, a xterm window will appear in the place of
-the drawn rectangle.
+`wglyph`, `hglyph`, `border`, and `title` refer to glyph width, glyph
+height, border width and title bar height, respectively.  Then, just run
+drawterm, and it will run slop(1), an utility that draws a rectangle on
+the screen with the mouse.  After drawing the rectangle, a xterm window
+will appear in the place of the drawn rectangle.
+
+icon(1) searches in $ICONPATH (a colon-separated list of paths to icon
+theme directories) for the files of the icons specified in the stdin.
+For example, the following commands set $ICONPATH, export it, and get
+the paths to some icons.  The files are preferably a 128-pixels width
+png file, or a 64-pixel width png file, or a scalable svg image.
+
+	$ ICONPATH=/usr/local/share/icons/faenza:/usr/local/share/icons/hicolor
+	$ export ICONPATH
+	$ cat <<EOF | icon 64 128 s
+	Applications/mpv
+	Applications/sxiv
+	MimeTypes/text-html
+	Places/user-trash
+	EOF
+
+iconcache(1) uses inkscape(1) to convert a newline-separated list of
+image files read from its stdin into png files, which are created in
+`$CACHEDIR/iconcache` (`$HOME/.cache/iconcache` by default).  It is
+used to convert svg icon files into png.  iconcache(1) receives as
+sole argument the size of the resulting png files.
+
+	$ <iconnames icon s | iconcache 64 >iconpaths
 
 mpdnotify(1) uses mpc(1) `current --wait` command to get the name of the
 currently playing song each time it changes.  You must call mpdnotify(1)

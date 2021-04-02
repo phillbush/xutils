@@ -4,7 +4,6 @@
 
 iflag=0
 apppath=${APPPATH:-/usr/local/share/applications:/usr/share/applications}
-appiconpath="$ICONPATH/apps"
 termcmd=${TERMCMD:-xterm}
 origifs="$IFS"
 
@@ -18,23 +17,12 @@ getfiles() {
 	IFS="$origifs"
 }
 
-# get icon path
-geticon() {
-	IFS=:
-	for dir in $appiconpath
-	do
-		file="$dir/$1.png"
-		[ -f "$file" ] && echo "$file" && return
-	done
-	IFS="$origifs"
-}
-
 # get application names
 getapps() {
 	for file in $(getfiles)
 	do
-		icon="$(sed -n "/^\[Desktop Entry\]$/,/^Icon *=/{/^Icon *=/{s/^Icon *= *//;p;};}" "$file")"
-		icon="$(geticon "$icon")"
+		iconname="$(sed -n "/^\[Desktop Entry\]$/,/^Icon *=/{/^Icon *=/{s/^Icon *= *//;p;};}" "$file")"
+		iconpath="$(echo "Applications/$iconname" | icon 64)"
 		if [ $iflag -eq 1 -a -n "$icon" ]
 		then
 			printf 'IMG:%s\t' "$icon"

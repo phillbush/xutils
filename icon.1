@@ -1,0 +1,74 @@
+.TH ICON 1
+.SH NAME
+icon \- print paths to icons in icon theme
+.SH SYNOPSIS
+.B icon
+.RI [ size... ]
+.SH DESCRIPTION
+.B icon
+reads icon names from its standard input, one per line,
+and prints the path to the files corresponding to those icons,
+in the order they are read.
+If a
+.I size
+is given as argument,
+.B icon
+searches for icons with that size.
+If more than one
+.I size
+is given, it is searched for icons with the first matching size.
+A size of
+.B s
+refers to a scalable svg file.
+.PP
+Each icon name read from standard input
+is composed by a case insensitive category
+(such as
+.BR Application )
+followed by a slash
+and a lowercase entry
+(such as
+.BR mpv ).
+See the
+.B EXAMPLES
+section.
+.PP
+Icons are processed based on the themes listed on the
+.B $ICONPATH
+environment variable.
+.SH ENVIRONMENT
+The following environment variables affect the execution of
+.BR icon .
+.TP
+.B ICONPATH
+Colon-separated list of paths to icon theme directories.
+Each directory must contain a valid
+.B index.theme
+file according to XDG Icon Theme Specification.
+If not set, it defaults to
+.B \(dq/usr/local/share/icons/hicolor:/usr/share/icons/hicolor\(dq .
+.SH EXAMPLES
+The following example sets
+.BR $ICONPATH ,
+exports it, and prints the paths to the files of the icons
+.BR Applications/mpv ,
+.BR Applications/sxiv ,
+.BR MimeTypes/text-html ,
+and
+.BR Places/user-trash .
+It tries to get preferably a 64-pixels width png image,
+or a 128-pixels width png image,
+or a scalable svg image; in that order.
+.IP
+.EX
+$ ICONPATH=/usr/local/share/icons/faenza:/usr/local/share/icons/hicolor
+$ export ICONPATH
+$ cat <<EOF | icon 64 128 s
+Applications/mpv
+Applications/sxiv
+MimeTypes/text-html
+Places/user-trash
+EOF
+.EE
+.SH SEE ALSO
+.IR iconcache (1)

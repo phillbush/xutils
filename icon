@@ -1,0 +1,147 @@
+#!/usr/bin/awk -f
+# icon - get path of a icon in icon theme
+
+function usage() {
+	print "usage: icon [category/]name[:sizes]..." >"/dev/stderr"
+	error = 1
+	exit
+}
+
+function err(str) {
+	printf "icon: %s\n", str >"/dev/stderr"
+	error = 1
+	exit
+}
+
+function warn(str) {
+	printf "icon: %s\n", str >"/dev/stderr"
+	warning = 1
+}
+
+BEGIN {
+	error = 0
+	iconpath = ENVIRON["ICONPATH"]
+	if (!iconpath)
+		iconpath = "/usr/local/share/icons/hicolor:/usr/share/icons/hicolor"
+	sizes[nsizes++] = "64"
+	sizes[nsizes++] = "128"
+	sizes[nsizes++] = "s"
+	if (ARGC > 1) {
+		delete sizes
+		nsizes = 0
+	}
+	for (i = 1; i < ARGC; i++) {
+		sizes[i] = ARGV[i]
+		nsizes++
+	}
+	ARGC = 1
+	nfiles = split(iconpath, themedir, /:/)
+	for (i = 1; i <= nfiles; i++) {
+		indexfile[i] = themedir[i] "/index.theme"
+		if (system("test -r " indexfile[i]) == 0) {
+			ARGV[i] = indexfile[i]
+			ARGC++
+		}
+	}
+	if (ARGC < 2)
+		err("environment variable ICONPATH not set")
+}
+
+FNR == 1 {
+	NFILE++
+	group = 0
+	ngroups[NFILE] = 0
+	delete a
+	delete d
+}
+
+$0 ~ / *\[ *Icon *Theme *\] */ {
+	if (group)
+		err(FILENAME ": file in wrong format")
+	group = "Icon Theme"
+	next
+}
+
+$0 ~ /^[ \t]*\[[ \t]*[^\]]+[ \t]*\][ \t]*$/ {
+	sub(/^[ \t]*\[[ \t]*/, "", $0)
+	sub(/[ \t]*\][ \t]*$/, "", $0)
+	group = $0
+	ngroups[NFILE]++
+	directories[NFILE, d[group], "path"] = themedir[NFILE] "/" group
+	next
+}
+
+group == "Icon Theme" && $1 ~ /^Directories/ {
+	sub(/^[ \t]*Directories[ \t]*=[ \t]*/, "", $0)
+	sub(/^[ \t]*$/, "", $0)
+	ndirs[NFILE] = split($0, a, /,[ \t]*/)
+	for (i in a)
+		d[a[i]] = i
+	next
+}
+
+group in d && $1 ~ /^[ \t]*Size[ \t]*=[ \t]*/ {
+	sub(/^[ \t]*Size[ \t]*=[ \t]*/, "", $0)
+	sub(/^[ \t]*$/, "", $0)
+	if (!directories[NFILE, d[group], "size"]) {
+		directories[NFILE, d[group], "size"] = $0
+	}
+}
+
+group in d && $1 ~ /^[ \t]*Context[ \t]*=[ \t]*/ {
+	sub(/^[ \t]*Context[ \t]*=[ \t]*/, "", $0)
+	sub(/^[ \t]*$/, "", $0)
+	directories[NFILE, d[group], "context"] = tolower($0)
+	if (directories[NFILE, d[group], "context"] == "apps")
+		directories[NFILE, d[group], "context"] = "applications"
+}
+
+group in d && $1 ~ /^[ \t]*Type[ \t]*=[ \t]*/ {
+	sub(/^[ \t]*Type[ \t]*=[ \t]*/, "", $0)
+	sub(/^[ \t]*$/, "", $0)
+	if ($0 == "Scalable")
+		directories[NFILE, d[group], "size"] = "s"
+}
+
+END {
+	if (error) {
+		exit error
+	}
+	while ((getline <"/dev/stdin") > 0) {
+		name = $0
+		if (match(name, /^[^:\/]+\//)) {
+			context = substr(name, 1, RLENGTH - 1)
+			name = substr(name, RLENGTH + 1)
+		} else {
+			context = "applications"
+		}
+		if (match(name, /:.*$/)) {
+			size = substr(name, RSTART + 1)
+			name = substr(name, 1, RSTART - 1)
+		}
+		context = tolower(context)
+		found = 0
+		for (s = 1; s <= nsizes; s++) {
+			size = sizes[s]
+			for (j = 1; j <= nfiles && !found; j++) {
+				for (k = 1; k <= ndirs[j] && !found; k++) {
+					if (context == directories[j, k, "context"] && size == directories[j, k, "size"]) {
+						if (size != "s" && system("test -r " directories[j, k, "path"] "/" name ".png") == 0) {
+							found = 1
+							print directories[j, k, "path"] "/" name ".png"
+						} else if (size == "s" && system("test -r " directories[j, k, "path"] "/" name ".svg") == 0) {
+							found = 1
+							print directories[j, k, "path"] "/" name ".svg"
+						}
+					}
+				}
+			}
+		}
+		if (!found) {
+			warn(name ": could not find file for icon")
+		}
+	}
+	if (warning) {
+		exit warning
+	}
+}

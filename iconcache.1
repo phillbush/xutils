@@ -1,0 +1,34 @@
+.TH ICONCACHE 1
+.SH NAME
+iconcache \- cache png images from svg files
+.SH SYNOPSIS
+.B iconcache
+.RI [ size ]
+.SH DESCRIPTION
+.B iconcache
+reads paths to image files from its standard input, one per line.
+If a read path points to a non svg file, it is printed into stdout.
+If a read path points to a svg file, it is checked in the cache
+directory if a corresponding png file exists for that svg file.
+If it exists, the path to that png file is printed into stdout.
+If it does not exist, the svg file is converted into png first.
+.PP
+If an argument is given, it defines the width of the resulting png image.
+A size of 64 pixels is used by default.
+.SH ENVIRONMENT
+The following environment variables affect the execution of
+.BR iconcache .
+.TP
+.B CACHEDIR
+Path to the cache directory.
+If not specified, defaults to
+.BR $XDG_CACHE_HOME ,
+which defaults to
+.BR $HOME/.cache .
+.SH FILES
+.TP
+.B $CACHEDIR/iconcache/
+Directory where icons are created.
+.SH SEE ALSO
+.IR icon (1),
+.IR inkscape (1)

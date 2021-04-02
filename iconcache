@@ -1,0 +1,34 @@
+#!/bin/sh
+# iconcache: cache png images from svg icons
+
+cachedir="${CACHEDIR:-${XDG_CACHE_HOME:-"$HOME/.cache"}}/iconcache"
+size=64
+exitval=0
+
+mkdir -p "$cachedir"
+
+[ "$#" -gt 0 ] && size="$1"
+
+while read -r from
+do
+	case "$from" in
+	*.svg)
+		to=$(echo $from | tr '/' '%')
+		to="${cachedir}/${to%.svg}${size}.png"
+		if [ ! -r "$to" ]
+		then
+			if ! inkscape -w "$size" -h "$size" -o "$to" "$from" >/dev/null 2>&1
+			then
+				echo "iconcache: $from: could not convert"
+				exitval=1
+				continue
+			fi
+		fi
+		echo $to
+		;;
+	*)
+		echo $from
+		;;
+	esac
+done
+exit $exitval
