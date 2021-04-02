@@ -109,11 +109,10 @@ END {
 	}
 	while ((getline <"/dev/stdin") > 0) {
 		name = $0
+		context = ""
 		if (match(name, /^[^:\/]+\//)) {
 			context = substr(name, 1, RLENGTH - 1)
 			name = substr(name, RLENGTH + 1)
-		} else {
-			context = "applications"
 		}
 		if (match(name, /:.*$/)) {
 			size = substr(name, RSTART + 1)
@@ -125,7 +124,7 @@ END {
 			size = sizes[s]
 			for (j = 1; j <= nfiles && !found; j++) {
 				for (k = 1; k <= ndirs[j] && !found; k++) {
-					if (context == directories[j, k, "context"] && size == directories[j, k, "size"]) {
+					if ((!context || context == directories[j, k, "context"]) && size == directories[j, k, "size"]) {
 						if (size != "s" && system("test -r " directories[j, k, "path"] "/" name ".png") == 0) {
 							found = 1
 							print directories[j, k, "path"] "/" name ".png"
@@ -133,7 +132,7 @@ END {
 							found = 1
 							print directories[j, k, "path"] "/" name ".svg"
 						}
-					}
+	 				}
 				}
 			}
 		}
