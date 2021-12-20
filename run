@@ -2,63 +2,66 @@
 # run - run a .desktop file
 # this file in public domain
 
-iflag=0
 apppath=${APPPATH:-/usr/local/share/applications:/usr/share/applications}
 termcmd=${TERMCMD:-xterm}
-origifs="$IFS"
 
 # get desktop files
 getfiles() {
 	IFS=:
 	for dir in $apppath
 	do
-		grep -iL "NoDisplay=true" "$dir"/*.desktop 2>/dev/null
+		fgrep -iL "NoDisplay=true" "$dir"/*.desktop 2>/dev/null
 	done
-	IFS="$origifs"
 }
 
 # get application names
 getapps() {
-	for file in $(getfiles)
-	do
-		iconname="$(sed -n "/^\[Desktop Entry\]$/,/^Icon *=/{/^Icon *=/{s/^Icon *= *//;p;};}" "$file")"
-		iconpath="$(echo "$iconname" | icon | iconcache)"
-		if [ $iflag -eq 1 -a -n "$iconpath" ]
-		then
-			printf 'IMG:%s\t' "$iconpath"
-			printf "%s" "$file" | sed 's:^\([^/]*/\)*\(.*\.\)*\([^.]*\)\.desktop$:\3:'
-		else
-			printf "%s" "$file" | sed 's:^\([^/]*/\)*\(.*\.\)*\([^.]*\)\.desktop$:\3:'
-			comment="$(sed -n "/^\[Desktop Entry\]$/,/^Comment *=/{/^Comment *=/{s/^Comment *= *//;p;};}" "$file")"
-			[ -n "$comment" ] && printf "\t%s" "$comment"
-		fi
-		echo
-	done
+	awk '
+	function basename(s) {
+		sub(/.*\//, "", s)
+		sub(/\.desktop$/, "", s)
+		sub(/.*\./, "", s)
+		return s
+	}
+
+	BEGIN {
+		FS = " *= *"
+		OFS = " - "
+	}
+
+	FNR == 1 {
+		apps[FILENAME] = ""
+	}
+
+	$1 == "Comment" || ($1 == "GenericName" && apps[FILENAME] == "") {
+		apps[FILENAME] = $2
+	}
+
+	END {
+		for (i in apps) {
+			print basename(i), apps[i]
+		}
+	}
+	' "$@"
 }
 
 # run an application
 run() {
-	term="$(sed -n "/^\[Desktop Entry\]$/,/^Terminal *=/{/^Terminal *=/{s/^Terminal *=//;p;};}" "$1")"
-	cmd="$(sed -n "/^\[Desktop Entry\]$/,/^Exec *=/{/^Exec *=/{s/^Exec *=//;s/ *%[uUFf].*//;p;};}" "$1")"
+
+	file="$1"
 	shift
-	trap "" 1 15
-	if [ "$term" = "true" ]
+	cmd="$(sed -n "/^\[Desktop Entry\]$/,/^Exec *=/{/^Exec *=/{s/^Exec *=//;s/ *%[uUFf].*//;p;};}" "$file")"
+	if egrep -s 'Terminal *= *true' "$file"
 	then
-		exec $TERMCMD -e sh -c "$cmd $@" &
+		exec "$termcmd" -e sh -c "$cmd $*" &
 	else
-		exec sh -c "$cmd $@" &
+		exec sh -c "exec $cmd $*" &
 	fi
 }
 
-if [ "$1" = '-i' ]
-then
-	iflag=1
-	shift
-fi
-
 case "$#" in
 0)
-	getapps
+	getapps `getfiles`
 	;;
 *)
 	if [ -f "$1" ]
